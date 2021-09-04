@@ -15,3 +15,13 @@ h3 {
 a {
   @apply text-blue-600 underline;
 }
+
+/* Cursors */
+
+.cursor-pat {
+  cursor: url("/cursors/pat.png"), pointer;
+}
+
+.cursor-scratch {
+  cursor: url("/cursors/scratch.png"), pointer;
+}
