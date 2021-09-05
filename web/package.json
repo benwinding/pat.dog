@@ -10,12 +10,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@react-three/fiber": "^7.0.6",
     "daisyui": "^1.14.0",
     "firebase": "^8.6.2",
     "next": "11.1.2",
     "qrcode": "^1.4.4",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "three": "^0.132.2"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.4.1",
