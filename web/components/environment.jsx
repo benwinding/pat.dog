@@ -1,13 +1,11 @@
-import * as THREE from "three";
+import React from "react";
 import { Canvas } from "@react-three/fiber";
-import { useLoader } from "@react-three/fiber";
+import { useLoader, useThree } from "@react-three/fiber";
 import { Environment, OrbitControls } from "@react-three/drei";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
-import { DDSLoader } from "three-stdlib";
+import { TextureLoader } from "three";
 import { Suspense } from "react";
-
-THREE.DefaultLoadingManager.addHandler(/\.dds$/i, new DDSLoader());
 
 export function MyCanvas() {
   return (
@@ -22,37 +20,33 @@ export function MyCanvas() {
 }
 
 function Scene() {
-  const BasePath = `${location.origin}/`;
-  const MTLURL = BasePath + "models/puppy/Puppy.mtl";
-  const OBJURL = BasePath + "models/puppy/Puppy.obj";
-  const materials = useLoader(MTLLoader, MTLURL);
-  const object = useLoader(OBJLoader, OBJURL, (loader) => {
-    materials.preload();
-    loader.setMaterials(materials);
-  });
-  return <primitive object={object} scale={0.02} />;
-}
-
-function Box(props) {
-  // This reference will give us direct access to the THREE.Mesh object
-  const ref = useRef();
-  // Set up state for the hovered and active state
-  const [hovered, setHover] = useState(false);
-  const [active, setActive] = useState(false);
-  // Subscribe this component to the render-loop, rotate the mesh every frame
-  useFrame((state, delta) => (ref.current.rotation.x += 0.01));
-  // Return the view, these are regular Threejs elements expressed in JSX
+  const BasePath = `${location.origin}/models/puppy/`;
   return (
-    <mesh
-      {...props}
-      ref={ref}
-      scale={active ? 1.5 : 1}
-      onClick={(event) => setActive(!active)}
-      onPointerOver={(event) => setHover(true)}
-      onPointerOut={(event) => setHover(false)}
-    >
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color={hovered ? "hotpink" : "orange"} />
-    </mesh>
+    <MeshBundle
+      obj={BasePath + "Puppy.obj"}
+      mtl={BasePath + "Puppy.mtl"}
+      image={BasePath + "tex/puppy_colormap.jpeg"}
+      normal={BasePath + "tex/puppy_normalmap.jpeg"}
+    />
   );
 }
+
+const MeshBundle = ({ obj, mtl, image, normal }) => {
+  const mesh = React.useRef();
+  const materialLoaded = useLoader(MTLLoader, mtl);
+  const objLoaded = useLoader(OBJLoader, obj);
+  const [colorMap, normalMap] = useLoader(TextureLoader, [image, normal]);
+
+  return (
+    <mesh
+      ref={mesh}
+      materials={materialLoaded.materials}
+      position={[0, 0, -200]}
+    >
+      <ambientLight intensity={0.4} />
+      <pointLight position={[50, 50, 50]} intensity={1} />
+      <primitive object={objLoaded} />
+      <meshStandardMaterial map={colorMap} normalMap={normalMap} />
+    </mesh>
+  );
+};
